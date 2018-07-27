@@ -45,6 +45,9 @@ var (
 		ConstantinopleBlock: nil,
 		ForkMasternode:      big.NewInt(300000),
 		ForkSmartContract:   big.NewInt(1200000),
+		ForkIoT:     		 big.NewInt(2200000),
+		ForkEcosystem:       big.NewInt(3200000),
+
 		Ethash:              new(EthashConfig), 
 	}
 
@@ -62,6 +65,8 @@ var (
 		ConstantinopleBlock: nil,
 		ForkMasternode:      big.NewInt(0),
 		ForkSmartContract:   big.NewInt(0),
+		ForkIoT:      		 big.NewInt(0),
+		ForkEcosystem:   	 big.NewInt(0),
 		Ethash:              new(EthashConfig),
 	}
 
@@ -79,6 +84,8 @@ var (
 		ConstantinopleBlock: nil,
 		ForkMasternode:      nil,
 		ForkSmartContract:   nil,
+		ForkIoT:      		 nil,
+		ForkEcosystem:   	 nil,
 		Clique: &CliqueConfig{
 			Period: 15,
 			Epoch:  30000,
@@ -90,16 +97,16 @@ var (
 	//
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
-	AllEthashProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), new(EthashConfig), nil}
+	AllEthashProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), new(EthashConfig), nil}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
 	// and accepted by the Ethereum core developers into the Clique consensus.
 	//
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
-	AllCliqueProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, &CliqueConfig{Period: 0, Epoch: 30000}}
+	AllCliqueProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, &CliqueConfig{Period: 0, Epoch: 30000}}
 
-	TestChainConfig = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), new(EthashConfig), nil}
+	TestChainConfig = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), new(EthashConfig), nil}
 	TestRules       = TestChainConfig.Rules(new(big.Int))
 )
 
@@ -125,8 +132,10 @@ type ChainConfig struct {
 
 	ByzantiumBlock      *big.Int `json:"byzantiumBlock,omitempty"`      // Byzantium switch block (nil = no fork, 0 = already on byzantium)
 	ConstantinopleBlock *big.Int `json:"constantinopleBlock,omitempty"` // Constantinople switch block (nil = no fork, 0 = already on byzantium)
-	ForkMasternode         *big.Int `json:"ForkMasternode,omitempty"`         // Roller switch block (nil = no fork, 0 = already on Roller)
+	ForkMasternode         *big.Int `json:"forkMasternode,omitempty"`         // Roller switch block (nil = no fork, 0 = already on Roller)
 	ForkSmartContract     *big.Int `json:"forkSmartContract,omitempty"`     //second fork Roller release
+	ForkIoT         *big.Int `json:"forkIoT,omitempty"`         // Roller switch block (nil = no fork, 0 = already on Roller)
+	ForkEcosystem     *big.Int `json:"forkEcosystem,omitempty"`     //second fork Roller release
 
 	// Various consensus engines
 	Ethash *EthashConfig `json:"ethash,omitempty"`
@@ -164,7 +173,7 @@ func (c *ChainConfig) String() string {
 	default:
 		engine = "unknown"
 	}
-	return fmt.Sprintf("{ChainID: %v Homestead: %v DAO: %v DAOSupport: %v EIP150: %v EIP155: %v EIP158: %v Byzantium: %v Constantinople: %v Fork Masternode: %v ForkSmartContract: %v Engine: %v}",
+	return fmt.Sprintf("{ChainID: %v Homestead: %v DAO: %v DAOSupport: %v EIP150: %v EIP155: %v EIP158: %v Byzantium: %v Constantinople: %v Fork Masternode: %v ForkSmartContract: %v IoT : %v Ecosystem : %v Engine: %v}",
 		c.ChainID,
 		c.HomesteadBlock,
 		c.DAOForkBlock,
@@ -176,6 +185,8 @@ func (c *ChainConfig) String() string {
 		c.ConstantinopleBlock,
 		c.ForkMasternode,
 		c.ForkSmartContract,
+		c.ForkIoT,
+		c.ForkEcosystem,
 		engine,
 	)
 }
@@ -220,9 +231,19 @@ func (c *ChainConfig) IsForkMasternode(num *big.Int) bool {
 	return isForked(c.ForkMasternode, num)
 }
 
-// IsBaneslayer returns whether num is either equal to the Baneslayer fork block or greater.
+// IsForkSmartContract returns whether num is either equal to the Baneslayer fork block or greater.
 func (c *ChainConfig) IsForkSmartContract(num *big.Int) bool {
 	return isForked(c.ForkSmartContract, num)
+}
+
+// IsForkIoT returns whether num is either equal to the Baneslayer fork block or greater.
+func (c *ChainConfig) IsForkIoT(num *big.Int) bool {
+	return isForked(c.ForkIoT, num)
+}
+
+// IsForkEcosystem returns whether num is either equal to the Baneslayer fork block or greater.
+func (c *ChainConfig) IsForkEcosystem(num *big.Int) bool {
+	return isForked(c.ForkEcosystem, num)
 }
 
 
@@ -294,6 +315,12 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, head *big.Int) *Confi
 	}
 	if isForkIncompatible(c.ForkSmartContract, newcfg.ForkSmartContract, head) {
 		return newCompatError("Baneslayer fork block smartcontract", c.ForkSmartContract, newcfg.ForkSmartContract)
+	}
+	if isForkIncompatible(c.ForkIoT, newcfg.ForkIoT, head) {
+		return newCompatError("Baneslayer fork block smartcontract", c.ForkIoT, newcfg.ForkIoT)
+	}
+	if isForkIncompatible(c.ForkEcosystem, newcfg.ForkEcosystem, head) {
+		return newCompatError("Baneslayer fork block smartcontract", c.ForkEcosystem, newcfg.ForkEcosystem)
 	}
 	
 	
@@ -367,6 +394,8 @@ type Rules struct {
 	IsConstantinople                          bool
 	IsForkMasternode                          bool
 	IsForkSmartContract                       bool
+	IsForkIoT                       		  bool
+	IsForkEcosystem  	                      bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -375,5 +404,5 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 	if chainID == nil {
 		chainID = new(big.Int)
 	}
-	return Rules{ChainID: new(big.Int).Set(chainID), IsHomestead: c.IsHomestead(num), IsEIP150: c.IsEIP150(num), IsEIP155: c.IsEIP155(num), IsEIP158: c.IsEIP158(num), IsByzantium: c.IsByzantium(num), IsConstantinople: c.IsConstantinople(num), IsForkMasternode: c.IsForkMasternode(num), IsForkSmartContract: c.IsForkSmartContract(num)}
+	return Rules{ChainID: new(big.Int).Set(chainID), IsHomestead: c.IsHomestead(num), IsEIP150: c.IsEIP150(num), IsEIP155: c.IsEIP155(num), IsEIP158: c.IsEIP158(num), IsByzantium: c.IsByzantium(num), IsConstantinople: c.IsConstantinople(num), IsForkMasternode: c.IsForkMasternode(num), IsForkSmartContract: c.IsForkSmartContract(num), IsForkIoT: c.IsForkIoT(num), IsForkEcosystem: c.IsForkEcosystem(num)}
 }
