@@ -544,13 +544,28 @@ func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header 
 	}
 	
 	if config.IsForkMasternode(header.Number) {
-		blockReward = BlockRewardRunMN //7.00
+		blockReward = BlockRewardRunMN //(Set Miner RW 7 ROL)
 	}
+
 	if config.IsForkSmartContract(header.Number) {
 		blockReward = big.NewInt(600e+16)           
 		MasterBlockReward = big.NewInt(225e+16) 
 		DevelopBlockReward = big.NewInt(75e+16) 
 	}
+
+	/*
+	Fork IoT
+	*/
+
+	if config.IsForkIoT(header.Number) {
+	}
+	/*
+	Fork Ecosystem
+	*/
+
+	if config.IsForkEcosystem(header.Number) {
+	}
+
 	
 	// Accumulate the rewards for the miner and any included uncles
 	reward := new(big.Int).Set(blockReward)
