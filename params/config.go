@@ -45,8 +45,8 @@ var (
 		ConstantinopleBlock: nil,
 		ForkMasternode:      big.NewInt(300000),
 		ForkSmartContract:   big.NewInt(1200000),
-		ForkIoT:     		 big.NewInt(2200000),
-		ForkEcosystem:       big.NewInt(3200000),
+		ForkIoT:     		 big.NewInt(2100000),
+		ForkEcosystem:       big.NewInt(4200000),
 
 		Ethash:              new(EthashConfig), 
 	}
