@@ -15,7 +15,6 @@
 */**/*dapps*
 build/_vendor/pkg
 *.orig
-/tests
 #*
 .#*
 *#
