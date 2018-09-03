@@ -49,6 +49,3 @@ masternode.sh
 parity.json
 utils.sh
 start-parity.sh
-/iot/*
-/lookwallet/*
-/token/*
